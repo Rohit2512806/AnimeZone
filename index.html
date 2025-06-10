@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ᗩᑎĺᗰⲈ乙❍ᑎⲈ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="components.css">
+  <style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 15px auto;
+  padding: 0 20px;
+}
+
+/* Section for "Latest Anime" and "Recommendations" */
+.anime-section {
+  background-color: var(--card-bg);
+  padding: 25px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* View All Button */
+.view-all-btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+.view-all-btn {
+  background-color: rgb(5, 139, 242);
+  color: #f9f6f6;
+  border: none;
+  padding: 0.5rem 1.5rem 0.5rem 1.5rem;
+  border-radius: 5px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+.view-all-btn:hover {
+  background-color: #00e6b3; /* A slightly different green on hover */
+}
+
+/* Styles for recommendation buttons */
+.recommendation-buttons {
+  display: flex;
+  gap: 5px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.recommendation-buttons button {
+  width: 100%;
+  background-color: rgb(5, 139, 242);
+  color: #f9f6f6;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.recommendation-buttons button:hover {
+  background-color: red;
+}
+.recommendation-status {
+   border-radius: 3px;
+   padding: 0.4rem 0.2rem 0.5rem 0.2rem;
+  background-color: orange;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.latest-anime-status {
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.latest-anime-status:contains("Complete") {
+    color: lightgreen; /* Complete के लिए रंग */
+}
+
+.latest-anime-status:contains("Ongoing") {
+    color: orange; /* Ongoing के लिए रंग */
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  .section-title {
+    font-size: 1.5em;
+  }
+  .anime-container {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.8rem;
+  }
+  .anime-card {
+    width: 112px;
+    height: 164px;
+
+  }
+  .anime-card img {
+    width: 100%;
+    height: 100%;
+  }
+  .anime-title {
+    max-width: 112px;
+    font-size: 0.8rem;
+  }
+  .episode-btn, .sub-btn {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.3rem;
+
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+  <div id="nav-placeholder"></div>
+
+  <div id="mainContent">
+    <div class="container">
+      <section id="latestAnimeSection" class="anime-section">
+        <h2 class="section-title">Latest Anime</h2>
+        <div class="anime-container" id="latestAnimeGrid">
+          </div>
+        <div class="view-all-btn-container" id="latestAnimeNextButton">
+          <a href="all-anime.html" class="view-all-btn">Next</a>
+        </div>
+      </section>
+
+      <section id="recommendationSection" class="anime-section">
+        <h2 class="section-title">Recommendations</h2>
+        <div class="recommendation-buttons">
+            <button id="btnRecommendedDrama">Drama</button>
+            <button id="btnHistorical">Historical</button>
+             <button id="btnAdventure">Adventure</button>
+            <button id="btnReincarnation">Reincarnation</button>
+        </div>
+        <div class="anime-container" id="recommendationGrid">
+          </div>
+      </section>
+      <div id="newSeriesPlaceholder"></div>
+      <div id="genreListPlaceholder"></div>
+    </div>
+  </div>
+  <div class="search-results-section" id="searchResultsSection">
+    <h2></h2>
+    <div class="anime-container" id="searchResultsContainer">
+        </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="animeData.js"></script>
+  <script src="components.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+     
+      // Latest Anime Section
+      
+      const latestAnimeGrid = document.getElementById('latestAnimeGrid');
+      if (latestAnimeGrid && typeof allAnimeList !== 'undefined') {
+        const latestAnimeUnsliced = [...allAnimeList].sort((a, b) => {
+            const getLatestEpisodeDate = (anime) => {
+                if (anime.episodes && anime.episodes.length > 0) {
+                    const uploadDates = anime.episodes.map(ep => new Date(ep.uploadDate)).filter(date => !isNaN(date));
+                    if (uploadDates.length > 0) {
+                        return new Date(Math.max(...uploadDates));
+                    }
+                }
+                return new Date(anime.uploadDate); // Fallback to anime's uploadDate if no valid episode date
+            };
+
+            const dateA = getLatestEpisodeDate(a);
+            const dateB = getLatestEpisodeDate(b);
+
+            return dateB - dateA;
+        });
+
+        console.log("पूरी सॉर्ट की गई सूची (शीर्ष 5):");
+        for (let i = 0; i < Math.min(5, latestAnimeUnsliced.length); i++) {
+            const anime = latestAnimeUnsliced[i];
+            const latestDate = anime.episodes ? Math.max(...anime.episodes.map(ep => new Date(ep.uploadDate)).filter(date => !isNaN(date))) : new Date(anime.uploadDate);
+            console.log(`${anime.title}: ${latestDate}`);
+        }
+
+        const latestAnime = latestAnimeUnsliced.slice(0, 19);
+
+        console.log("पहले 19 एनीमे (स्लाइस के बाद):");
+        for (let i = 0; i < latestAnime.length; i++) {
+            const anime = latestAnime[i];
+            const latestDate = anime.episodes ? Math.max(...anime.episodes.map(ep => new Date(ep.uploadDate)).filter(date => !isNaN(date))) : new Date(anime.uploadDate);
+            console.log(`${anime.title}: ${latestDate}`);
+        }
+
+        latestAnime.forEach(anime => {
+          latestAnimeGrid.appendChild(createAnimeCard(anime,false)); // सामान्य createAnimeCard का उपयोग करना
+        });
+      }
+
+      // Recommendation Section
+      const recommendationGrid = document.getElementById('recommendationGrid');
+      const btnRecommendedDrama = document.getElementById('btnRecommendedDrama');
+      const btnHistorical = document.getElementById('btnHistorical');
+     const btnAdventure = document.getElementById('btnAdventure');
+      const btnReincarnation = document.getElementById('btnReincarnation');
+
+      // Function to display anime in the recommendation grid
+      function displayRecommendations(animeSubset) {
+        recommendationGrid.innerHTML = ''; // Clear existing cards
+        if (recommendationGrid && typeof allAnimeList !== 'undefined') {
+          const numberOfRecommendationsToShow = 5; // आप यहाँ जितने एनीमे दिखाना चाहते हैं उतनी संख्या लिखें
+          const limitedAnimeSubset = animeSubset.slice(0, numberOfRecommendationsToShow);
+          limitedAnimeSubset.forEach(anime => {
+            recommendationGrid.appendChild(createAnimeCard(anime, true));
+          });
+        }
+      }
+
+ function filterAnimeByGenre(genre) {
+        return allAnimeList.filter(anime => anime.genre && anime.genre.includes(genre));
+      }
+
+      const defaultRecommendations = filterAnimeByGenre("Drama");
+      displayRecommendations(defaultRecommendations);
+
+      // Event listener for the RecommendedDrama button
+      btnRecommendedDrama.addEventListener('click', () => {
+        const dramaAnime = filterAnimeByGenre("Drama");
+        displayRecommendations(dramaAnime);
+      });
+
+      // Event listeners for other recommendation buttons
+      btnHistorical.addEventListener('click', () => {
+        const historicalAnime = filterAnimeByGenre("Historical"); // Assuming genre name is "Historical"
+        displayRecommendations(historicalAnime);
+      });
+
+       // Event listeners for other recommendation buttons
+      btnAdventure.addEventListener('click', () => {
+        const AdventureAnime = filterAnimeByGenre("Adventure"); // Assuming genre name is "Historical"
+        displayRecommendations(AdventureAnime);
+      });
+
+      btnReincarnation.addEventListener('click', () => {
+        const reincarnationAnime = filterAnimeByGenre("Reincarnation"); // Assuming genre name is "Reincarnation"
+        displayRecommendations(reincarnationAnime);
+      });
+
+      // Populate Season List (Example, you'd extend this with actual season data)
+      const seasonListContainer = document.getElementById('seasonList');
+      if (seasonListContainer) {
+        const seasons = ["Spring 2024", "Summer 2024", "Fall 2024", "Winter 2025"];
+        seasons.forEach(season => {
+          const seasonItem = document.createElement('div');
+          seasonItem.className = 'season-item';
+          seasonItem.textContent = season;
+          seasonItem.onclick = () => alert(`Showing anime for ${season}`);
+          seasonListContainer.appendChild(seasonItem);
+        });
+      }
+    });
+   
+  </script>
+</body>
+</html>
